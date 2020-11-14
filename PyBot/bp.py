@@ -1,3 +1,5 @@
+from builtins import memoryview
+
 import telebot
 import config
 import json
@@ -17,7 +19,7 @@ class StringConst:
     string_Exit = "Выйти"
     string_Back = "Назад"
 
-    string_Choose = "Введите номер рецепта"
+    string_Choose = "Ввести номер рецепта"
 
 
 # keyboard
@@ -92,8 +94,38 @@ class FromToServer:
 
     @staticmethod
     def GetRecipe(_id): #id, name, shor_desc, recept, time
-        # Call to server
+        # Call to server to give json
+        jsonRecipe = """
+        {
+            "id" : 1,
+            "name" : "recipe1",
+            "short_decsrition" : "hghfghfgjlkjfglhjfkgjhfjhofgjhofgjhofj",
+            "time" : 160000,
+            "step" : [
+                         {
+                          "id" : 1,
+                          "time" : 15,
+                          "desc" : "Step1 DESCRIPTION"
+                         },
+                         {
+                          "id" : 2,
+                          "time" : 13000,
+                          "desc" : "Step2 DESCRIPTION"
+                         },
+                         {
+                          "id" : 3,
+                          "time" : 1200,
+                          "desc" : "Step3 DESCRIPTION"
+                         }
+                     ]
+        }
+        """
+        dic = json.loads(jsonRecipe)
+        strOut = ""
+        strOut += dic["name"] + '\n' + dic["short_decsrition"] + '\n' + str(dic["time"])
+        return strOut
         pass
+
 
 class RecipesList:
     pass
@@ -118,7 +150,7 @@ def SendToBotLoginCode(message):
             if FromToServer.SendLoginCode(json.dumps(message.text)):
                 AllUsers[message.chat.id].isLogin = True
                 bot.send_message(message.chat.id,
-                         StringConst.string_LoginSucsess + StringConst.string_WhatNext,
+                         StringConst.string_LoginSucsess + " " + StringConst.string_WhatNext,
                          reply_markup=markup1)
             else:
                 bot.send_message(message.chat.id, StringConst.string_LoginError)
@@ -132,15 +164,22 @@ def SendToBotLoginCode(message):
                                  reply_markup=markupChoose)
             elif message.text == StringConst.string_Exit:
                 bot.send_message(message.chat.id,
-                                 "Выход. Отправьте /start чтобы начать с начала",
+                                 "Выход. Отправьте /start чтобы начать с начала.",
                                  reply_markup=markupNull)
                 AllUsers.pop(message.chat.id)
             elif message.text == StringConst.string_Choose:
                 AllUsers[message.chat.id].isChoose = True
-                bot.send_message(message.chat.id, "", reply_markup=markupNull)
+                bot.send_message(message.chat.id, "Прошу, вводите.", reply_markup=markupNull)
+
             elif message.text == StringConst.string_Back:
                 AllUsers[message.chat.id].isChoose = False
-                bot.send_message(message.chat.id, "", reply_markup=markup1)
+                bot.send_message(message.chat.id, "Как пожелаете.", reply_markup=markup1)
+            elif AllUsers[message.chat.id].isChoose:
+                try:
+                    bla = int(message.text)
+                    bot.send_message(message.chat.id, FromToServer.GetRecipe(bla))
+                except BaseException:
+                    bot.send_message(message.chat.id, "Неверный ввод. Попробуйте ещё раз")
             else:
                 bot.send_message(message.chat.id, "Команда не распознана.")
 
