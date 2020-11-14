@@ -1,0 +1,36 @@
+<?
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Pages extends CI_Controller {
+
+
+    
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('recipes');
+    }
+
+ 
+
+    public function view($page = 'home')
+	{
+            if($page == 'home'){
+                $data['recipes'] = $this->recipes->get_recipes();
+            }
+
+			if ( ! file_exists(APPPATH.'/views/pages/'.$page.'.php'))
+			{
+					// Упс, у нас нет такой страницы!
+					show_404();
+			}
+
+			//$data['title'] = ucfirst($page); // Capitalize the first letter
+			$data['title'] = "Главная страница"; // Capitalize the first letter
+
+			$this->load->view('templates/header', $data);
+			$this->load->view('pages/'.$page, $data);
+			$this->load->view('templates/footer', $data);
+    }
+ 
+}
