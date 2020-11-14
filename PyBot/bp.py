@@ -20,6 +20,12 @@ class StringConst:
     string_Back = "Назад"
 
     string_Choose = "Ввести номер рецепта"
+    string_GoCooking = "Готовить!"
+
+    string_EndStep = "Выйти"
+    string_NextStep = "Далее"
+    string_BackStep = "Назад"
+    string_ExitStep = "Завершить"
 
 
 # keyboard
@@ -27,17 +33,40 @@ markup1 = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 buttonGetAllRecept = telebot.types.KeyboardButton(StringConst.string_ShowRecipesList)
 buttonExit = telebot.types.KeyboardButton(StringConst.string_Exit)
 
+markup2 = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+buttonGoCooking = telebot.types.KeyboardButton(StringConst.string_GoCooking)
+
 markupChoose = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 buttonChoose = telebot.types.KeyboardButton(StringConst.string_Choose)
 buttonBack = telebot.types.KeyboardButton(StringConst.string_Back)
 
+markupBeginCooking = telebot.types.ReplyKeyboardMarkup(row_width=2)
+buttonNextOfStep = telebot.types.InlineKeyboardButton(StringConst.string_NextStep
+                                                      , callback_data='Next')
+buttonBackOfStep = telebot.types.InlineKeyboardButton(StringConst.string_BackStep
+                                                      , callback_data='Back')
+
+markupMiddleCooking = telebot.types.InlineKeyboardMarkup(row_width=2)
+buttonExitOfStep = telebot.types.InlineKeyboardButton(StringConst.string_ExitStep
+                                                      ,callback_data='Exit')
+buttonEndOfStep = telebot.types.InlineKeyboardButton(StringConst.string_EndStep
+                                                     ,callback_data='End')
+
+markupEndCooking = telebot.types.InlineKeyboardMarkup(row_width=2)
+
 markupNull = telebot.types.ReplyKeyboardRemove()
 markup1.add(buttonGetAllRecept, buttonExit)
 markupChoose.add(buttonChoose, buttonBack)
+markup2.add(buttonGoCooking, buttonBack)
+markupBeginCooking.add(buttonEndOfStep, buttonNextOfStep)
+markupMiddleCooking.add(buttonBackOfStep, buttonNextOfStep)
+markupMiddleCooking.add(buttonBackOfStep, buttonExitOfStep)
 
 class User:
     isLogin = False
     isChoose = False
+
+    steps = {}
 
     def __init__(self):
         isLogin = False
@@ -93,7 +122,7 @@ class FromToServer:
         return strOut
 
     @staticmethod
-    def GetRecipe(_id): #id, name, shor_desc, recept, time
+    def GetRecipe(_id, _userId): #id, name, shor_desc, recept, time
         # Call to server to give json
         jsonRecipe = """
         {
@@ -116,22 +145,23 @@ class FromToServer:
                           "id" : 3,
                           "time" : 1200,
                           "desc" : "Step3 DESCRIPTION"
+                         },
+                         {
+                          "id" : 4,
+                          "time" : 541200,
+                          "desc" : "Step4 DESCRIPTION"
                          }
                      ]
         }
         """
         dic = json.loads(jsonRecipe)
+
+        AllUsers[_userId].steps = dic["step"]
+
         strOut = ""
         strOut += dic["name"] + '\n' + dic["short_decsrition"] + '\n' + str(dic["time"])
         return strOut
         pass
-
-
-class RecipesList:
-    pass
-    # listSize = 5
-    # listIdBegin = 0
-    # listIdEnd = listSize
 
 
 @bot.message_handler(commands=['start'])
@@ -177,11 +207,25 @@ def SendToBotLoginCode(message):
             elif AllUsers[message.chat.id].isChoose:
                 try:
                     bla = int(message.text)
-                    bot.send_message(message.chat.id, FromToServer.GetRecipe(bla))
+                    bot.send_message(message.chat.id, FromToServer.GetRecipe(bla, message.chat.id), reply_markup=markup2)
+                    AllUsers[message.chat.id].isChoose = False
                 except BaseException:
                     bot.send_message(message.chat.id, "Неверный ввод. Попробуйте ещё раз")
             else:
                 bot.send_message(message.chat.id, "Команда не распознана.")
+
+
+@bot.callback_query_handler(func=lambda call: True):
+def callback_inline(call):
+    try:
+        if call.data == 'Next':
+            pass
+        elif call.data == 'Back':
+            pass
+        elif call.data == 'End':
+            pass
+        elif call.data == 'Exit':
+            pass
 
 
 # run
