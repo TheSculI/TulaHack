@@ -3,33 +3,7 @@ import config
 import json
 
 bot = telebot.TeleBot(config.TOKEN)
-AllUsers = []
-
-test1 = """{
-    "id": "1",
-    "name": "bulka",
-    "recpit": "2"
-}"""
-test2 = """{
-    "id": "2",
-    "name": "bulka2",
-    "recpit": "23"
-}"""
-test3 = """{
-    "id": "3",
-    "name": "bulka3",
-    "recpit": "24"
-}"""
-test4 = """{
-    "id": "4",
-    "name": "bulka4",
-    "recpit": "24"
-}"""
-test5 = """{
-    "id": "5",
-    "name": "bulka5",
-    "recpit": "24"
-}"""
+AllUsers = {}
 
 
 class StringConst:
@@ -59,41 +33,11 @@ markup1.add(buttonGetAllRecept, buttonExit)
 markup2.add(buttonAddIdList, buttonPreIdList)
 
 
-class TestJSON:
-    test1 = """{
-        "id": "1",
-        "name": "bulka",
-        "recpit": "22"
-    }"""
-    test2 = """{
-        "id": "2",
-        "name": "bulka2",
-        "recpit": "23"
-    }"""
-    test3 = """{
-        "id": "3",
-        "name": "bulka3",
-        "recpit": "25"
-    }"""
-    test4 = """{
-        "id": "4",
-        "name": "bulka4",
-        "recpit": "26"
-    }"""
-    test5 = """{
-        "id": "5",
-        "name": "bulka5",
-        "recpit": "27"
-    }"""
-
-
 class User:
     isLogin = False
-    chatId = -1
 
-    def __init__(self, _chatId):
+    def __init__(self):
         isLogin = False
-        chatId = _chatId
 
     def GetUser(self, chatId):
         for us in AllUsers:
@@ -104,24 +48,65 @@ class User:
 
 class FromToServer:
     @staticmethod
-    def SendLoginCode(self, jsonString):
-        #Send to server jsonString
-        return True #/False
+    def SendLoginCode(jsonString):
+        # Send to server jsonString
+        # Ans of server - true/false >>
+        ans = True
+        return ans
+
+    @staticmethod
+    def ViewRecipes(_id):
+        # Call server on _id give json { id, name, recNum } >>
+        fromToServerToLove = """ 
+                {
+                    "recipes":[   
+                        {
+                            "id" : 1,
+                            "name" : "Recept1",
+                            "recNum" : 1                    
+                        },
+                        {
+                            "id" : 2,
+                            "name" : "Recept2",
+                            "recNum" : 2                    
+                        },
+                        {
+                            "id" : 3,
+                            "name" : "Recept3",
+                            "recNum" : 3              
+                        },
+                        {
+                            "id" : 6,
+                            "name" : "Recept6",
+                            "recNum" : 6                
+                        },
+                        {
+                            "id" : 7,
+                            "name" : "Recept7",
+                            "recNum" : 7                    
+                        }    
+                    ] 
+                }
+                """
+        dic = json.loads(fromToServerToLove)
+        strOut = ""
+        for i in range(0, len(dic["recipes"])):
+            strOut += dic["recipes"][i]["recNum"] + " " + dic["recipes"][i]["name"] + '\n'
+        return strOut
 
 
 class RecipesList:
-    listSize = 3
-    listIdBegin = 0
-    listIdEnd = listSize
-
-    recipesList = []
+    pass
+    # listSize = 5
+    # listIdBegin = 0
+    # listIdEnd = listSize
 
 
 @bot.message_handler(commands=['start'])
 def StartBot(message):
-    if AllUsers.count(message.chat.id) < 1:
-        d = {message.chat.id: False}
-        AllUsers.append(d)
+    if not AllUsers.get(message.chat.id):
+        d = {message.chat.id: User()}
+        AllUsers.update(d)
     else:
         if not AllUsers[message.chat.id].isLogin:
             bot.send_message(message.chat.id, StringConst.string_GiveMeToken)
@@ -134,14 +119,26 @@ def SendToBotLoginCode(message):
             if FromToServer.SendLoginCode(json.dumps(message.text)):
                 AllUsers[message.chat.id].isLogin = True
                 bot.send_message(message.chat.id,
-                                 StringConst.string_LoginSucsess+StringConst.string_WhatNext,
+                                 StringConst.string_LoginSucsess + StringConst.string_WhatNext,
                                  reply_markup=markup1)
-
+            else:
+                bot.send_message(message.chat.id, StringConst.string_LoginError)
         else:
-            bot.send_message(message.chat.id, StringConst.string_LoginError)
+            bot.send_message(message.chat.id, StringConst.string_LoginUncorrect)
     else:
         if message.chat.type == 'private':
-            pass
+            if message.text == StringConst.string_ShowRecipesList:
+                bot.send_message(message.chat.id,
+                                 FromToServer.ViewRecipes(message.chat.id),
+                                 reply_markup=markup1)
+            elif message.text == StringConst.string_Exit:
+                bot.send_message(message.chat.id,
+                                 "Выход. Отправьте /start чтобы начать с начала",
+                                 reply_markup=markupNull)
+                AllUsers.pop(message.chat.id)
+            else:
+                bot.send_message(message.chat.id, "Команда не распознана.")
+
 
 # run
 bot.polling(none_stop=True)
