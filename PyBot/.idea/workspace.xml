@@ -20,6 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ae7bb8c7-794c-4edb-b68e-d3890f57e733" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bp.py" beforeDir="false" afterPath="$PROJECT_DIR$/bp.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -138,5 +139,9 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="922" height="120" key="GridCell.Tab.1.right/0.0.1920.1040/-1440.180.1440.900@0.0.1920.1040" timestamp="1605391989248" />
+    <state x="1103" y="229" width="672" height="678" key="search.everywhere.popup" timestamp="1605397699234">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1103" y="229" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/-1440.180.1440.900@0.0.1920.1040" timestamp="1605397699234" />
   </component>
 </project>
