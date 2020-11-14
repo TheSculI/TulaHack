@@ -15,8 +15,9 @@ class StringConst:
 
     string_ShowRecipesList = "Просмотреть все рецепты"
     string_Exit = "Выйти"
-    string_NextIdList = "Следющий лист"
-    string_PreIdList = "Предыдущий лист"
+    string_Back = "Назад"
+
+    string_Choose = "Введите номер рецепта"
 
 
 # keyboard
@@ -24,17 +25,17 @@ markup1 = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 buttonGetAllRecept = telebot.types.KeyboardButton(StringConst.string_ShowRecipesList)
 buttonExit = telebot.types.KeyboardButton(StringConst.string_Exit)
 
-markup2 = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-buttonAddIdList = telebot.types.KeyboardButton(StringConst.string_NextIdList)
-buttonPreIdList = telebot.types.KeyboardButton(StringConst.string_PreIdList)
+markupChoose = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+buttonChoose = telebot.types.KeyboardButton(StringConst.string_Choose)
+buttonBack = telebot.types.KeyboardButton(StringConst.string_Back)
 
 markupNull = telebot.types.ReplyKeyboardRemove()
 markup1.add(buttonGetAllRecept, buttonExit)
-markup2.add(buttonAddIdList, buttonPreIdList)
-
+markupChoose.add(buttonChoose, buttonBack)
 
 class User:
     isLogin = False
+    isChoose = False
 
     def __init__(self):
         isLogin = False
@@ -62,28 +63,23 @@ class FromToServer:
                     "recipes":[   
                         {
                             "id" : 1,
-                            "name" : "Recept1",
-                            "recNum" : 1                    
+                            "name" : "Recept1"                   
                         },
                         {
                             "id" : 2,
-                            "name" : "Recept2",
-                            "recNum" : 2                    
+                            "name" : "Recept2"                   
                         },
                         {
                             "id" : 3,
-                            "name" : "Recept3",
-                            "recNum" : 3              
+                            "name" : "Recept3"            
                         },
                         {
                             "id" : 6,
-                            "name" : "Recept6",
-                            "recNum" : 6                
+                            "name" : "Recept6"            
                         },
                         {
                             "id" : 7,
-                            "name" : "Recept7",
-                            "recNum" : 7                    
+                            "name" : "Recept7"              
                         }    
                     ] 
                 }
@@ -91,9 +87,13 @@ class FromToServer:
         dic = json.loads(fromToServerToLove)
         strOut = ""
         for i in range(0, len(dic["recipes"])):
-            strOut += dic["recipes"][i]["recNum"] + " " + dic["recipes"][i]["name"] + '\n'
+            strOut += str(dic["recipes"][i]["id"]) + ") " + dic["recipes"][i]["name"] + '\n'
         return strOut
 
+    @staticmethod
+    def GetRecipe(_id): #id, name, shor_desc, recept, time
+        # Call to server
+        pass
 
 class RecipesList:
     pass
@@ -119,8 +119,8 @@ def SendToBotLoginCode(message):
             if FromToServer.SendLoginCode(json.dumps(message.text)):
                 AllUsers[message.chat.id].isLogin = True
                 bot.send_message(message.chat.id,
-                                 StringConst.string_LoginSucsess + StringConst.string_WhatNext,
-                                 reply_markup=markup1)
+                         StringConst.string_LoginSucsess + StringConst.string_WhatNext,
+                         reply_markup=markup1)
             else:
                 bot.send_message(message.chat.id, StringConst.string_LoginError)
         else:
@@ -130,12 +130,18 @@ def SendToBotLoginCode(message):
             if message.text == StringConst.string_ShowRecipesList:
                 bot.send_message(message.chat.id,
                                  FromToServer.ViewRecipes(message.chat.id),
-                                 reply_markup=markup1)
+                                 reply_markup=markupChoose)
             elif message.text == StringConst.string_Exit:
                 bot.send_message(message.chat.id,
                                  "Выход. Отправьте /start чтобы начать с начала",
                                  reply_markup=markupNull)
                 AllUsers.pop(message.chat.id)
+            elif message.text == StringConst.string_Choose:
+                AllUsers[message.chat.id].isChoose = True
+                bot.send_message(message.chat.id, "", reply_markup=markupNull)
+            elif message.text == StringConst.string_Back:
+                AllUsers[message.chat.id].isChoose = False
+                bot.send_message(message.chat.id, "", reply_markup=markup1)
             else:
                 bot.send_message(message.chat.id, "Команда не распознана.")
 
