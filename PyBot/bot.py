@@ -1,8 +1,9 @@
 import telebot
 import config
-import _json
+import json
 
 bot = telebot.TeleBot(config.TOKEN)
+
 # string const
 string_GiveMeToken = 'Для начала работы, пришлите логин и через пробел код, выданный в личном кабинете.'
 string_LoginUncorrect = 'Данные введены не корректно. Проверьте и отправьте снова.'
@@ -14,8 +15,9 @@ string_Dalee = "Что далее?"
 login = "user"
 code = ""
 chatId = -1
-namesRecipes = []  # 'string'
-userId = ""
+global namesRecipes
+# namesRecipes = []  # 'string'
+userIdMy = ""
 listSize = 3
 listIdBegin = 0
 listIdEnd = listSize
@@ -23,33 +25,34 @@ listIdEnd = listSize
 # bool
 isLogin = False
 
-test1 = {
+test1 = """{
     "id": "1",
     "name": "bulka",
     "recpit": "2"
-}
-test2 = {
+}"""
+test2 = """{
     "id": "2",
     "name": "bulka2",
     "recpit": "23"
-}
-test3 = {
+}"""
+test3 = """{
     "id": "3",
     "name": "bulka3",
     "recpit": "24"
-}
-test4 = {
+}"""
+test4 = """{
     "id": "4",
     "name": "bulka4",
     "recpit": "24"
-}
-test5 = {
+}"""
+test5 = """{
     "id": "5",
     "name": "bulka5",
     "recpit": "24"
-}
+}"""
 
 # temp
+# RecipesTH2020Bot
 # recipes: id, name, recip
 
 # button
@@ -70,62 +73,6 @@ buttonPreIdList = telebot.types.KeyboardButton(string_PreIdList)
 markupNull = telebot.types.ReplyKeyboardRemove()
 markup1.add(buttonGetAllRecept, buttonExit)
 markup2.add(buttonAddIdList, buttonPreIdList)
-
-
-@bot.message_handler(commands=['start'])
-def StartBot(message):
-    if not isLogin:
-        global chatId
-        chatId = message.chat.id
-        global userId
-        userId = "1"
-        # message.user.id
-        bot.send_message(chatId, string_GiveMeToken)
-
-
-@bot.message_handler(content_types=['text'])
-def SendToBotLoginCode(message):
-    global isLogin
-    global code
-    global login
-    if not isLogin:
-        check = len(message.text.split())
-        if check == 2:
-            SendLoginCode(message.text)
-        else:
-            bot.send_message(chatId, string_LoginUncorrect)
-    else:
-        global listIdBegin
-        global listIdEnd
-        if message.chat.type == 'private':
-            if message.text == string_ShowRecipesList:
-                bot.send_message(chatId, showRecipeList(), reply_markup=markup1)
-
-            elif message.text == string_Exit:
-
-                bot.send_message(chatId, "Выход. Отправьте /start чтобы начать с начала", reply_markup=markupNull)
-                isLogin = False
-                ResetValues()
-
-            elif message.text == string_NextIdList:
-                listIdBegin += listSize
-                listIdEnd += listSize
-                if listIdBegin > len(namesRecipes) - 1:
-                    listIdBegin = len(namesRecipes) - 1
-                    listIdEnd = len(namesRecipes)
-                bot.send_message(chatId, showRecipeList(), reply_markup=markup2)
-
-            elif message.text == string_NextIdList:
-                listIdBegin -= listSize
-                listIdEnd -= listSize
-                if listIdBegin < 0:
-                    listIdBegin = 0
-                    listIdEnd = listSize
-                bot.send_message(chatId, showRecipeList(), reply_markup=markup2)
-
-            else:
-                bot.send_message(chatId, "Команда не распознана.")
-
 
 def ResetValues():
     global login
@@ -168,8 +115,8 @@ def ConvertToJSONUserID(_userId):
 
 def GetRecipesFromServer(_userId):
     # call to server...and convert json to list
-    list = [test1, test2, test3, test4, test5]  # string
-    return list
+    dic = json.loads(test1)
+    return [dic["name"]]
 
 
 def SendLoginCode(_loginCode):
@@ -177,22 +124,81 @@ def SendLoginCode(_loginCode):
     global namesRecipes
     if isTryUser(ConvertToJSONLoginCode(_loginCode)):
         isLogin = True
-        namesRecipes = GetRecipesFromServer(userId)
+        dic1 = json.loads(test1)
+        dic2 = json.loads(test2)
+        namesRecipes = [dic1["name"], dic2["name"]]#GetRecipesFromServer(userId)
         bot.send_message(chatId, string_LoginSucsess+'\n'+string_Dalee, reply_markup=markup1)
-        bot.send_message(chatId, showRecipeList(), reply_markup=markup1)
     else:
         isLogin = False
         bot.send_message(chatId, string_LoginError)
 
-
 def showRecipeList():
-    stringOut = ""
+    stringOut = "bad"
     try:
-        for i in range(listIdBegin, listIdEnd):
-            stringOut = stringOut + namesRecipes[i] + '\n'
+        templen = len(namesRecipes)
+        tempval = listIdEnd
+        if templen - listIdEnd < 0:
+            tempval = templen
+        bot.send_message(namesRecipes(0))
+        for i in range(listIdBegin, tempval+1):
+            stringOut = (i+1) + stringOut + namesRecipes[i] + '\n'
     except BaseException:
         return stringOut
     return stringOut
+
+@bot.message_handler(commands=['start'])
+def StartBot(message):
+    if not isLogin:
+        global chatId
+        chatId = message.chat.id
+        global userId
+        userId = "1"
+        # message.user.id
+        bot.send_message(chatId, string_GiveMeToken)
+
+@bot.message_handler(content_types=['text'])
+def SendToBotLoginCode(message):
+
+    global isLogin
+    global code
+    global login
+    if not isLogin:
+        check = len(message.text.split())
+        if check == 2:
+            SendLoginCode(message.text)
+        else:
+            bot.send_message(chatId, message.chat.id. User.userId)
+    else:
+        global listIdBegin
+        global listIdEnd
+        if message.chat.type == 'private':
+            if message.text == string_ShowRecipesList:
+                bot.send_message(chatId, showRecipeList(), reply_markup=markup1)
+
+            elif message.text == string_Exit:
+
+                bot.send_message(chatId, "Выход. Отправьте /start чтобы начать с начала", reply_markup=markupNull)
+                isLogin = False
+                ResetValues()
+
+            elif message.text == string_NextIdList:
+                listIdBegin += listSize
+                listIdEnd += listSize
+                if listIdBegin > len(namesRecipes) - 1:
+                    listIdBegin = len(namesRecipes) - 1
+                    listIdEnd = len(namesRecipes)
+                bot.send_message(chatId, showRecipeList(), reply_markup=markup2)
+
+            elif message.text == string_NextIdList:
+                listIdBegin -= listSize
+                listIdEnd -= listSize
+                if listIdBegin < 0:
+                    listIdBegin = 0
+                    listIdEnd = listSize
+                bot.send_message(chatId, showRecipeList(), reply_markup=markup2)
+
+            else:
+                bot.send_message(chatId, "Команда не распознана.")
 
 
 # run
