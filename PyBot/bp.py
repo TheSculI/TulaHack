@@ -107,9 +107,8 @@ def StartBot(message):
     if not AllUsers.get(message.chat.id):
         d = {message.chat.id: User()}
         AllUsers.update(d)
-    else:
-        if not AllUsers[message.chat.id].isLogin:
-            bot.send_message(message.chat.id, StringConst.string_GiveMeToken)
+    if not AllUsers[message.chat.id].isLogin:
+        bot.send_message(message.chat.id, StringConst.string_GiveMeToken)
 
 
 @bot.message_handler(content_types=['text'])
