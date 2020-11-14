@@ -15,9 +15,15 @@ class Recipes_model extends CI_Model
                 $query = $this->db->get('recipes');
                 return $query->result_array();
         }
-
+        /*
+        $query = $this->db->query("SELECT * FROM `recipes`,`favorites` WHERE `recipes`.`code` = '".$code."' AND `recipes`.`id` = `favorites`.`idRecipes` ");
+        $result = [];
+        foreach ($query->result() as $row){
+            $result = $row;
+        }*/
         $query = $this->db->get_where('recipes', array('code' => $code));
         return $query->row_array();
+        //return $result;
     }
 
 }

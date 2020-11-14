@@ -12,7 +12,7 @@ class Recipes extends CI_Controller {
         public function index()
         {
                 //$data['news'] = $this->news_model->get_news();
-                $data['title'] = 'Recipes ';
+                $data['title'] = 'Рецепты ';
                 $data['recipes'] = $this->recipes->get_recipes();
 
                 $this->load->view('templates/header', $data);
@@ -22,7 +22,7 @@ class Recipes extends CI_Controller {
 
         public function view($code = NULL)
         {
-                
+                 
                 $data['recip_item'] = $this->recipes->get_recipes($code);
                 //$data['news_item'] = $this->news_model->get_news($slug);
 

@@ -51,6 +51,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 /*$route['news/(:any)'] = 'news/view/$1';
 $route['news'] = 'news';*/
+$route['favourites'] = 'favourites';
+$route['users'] = 'users';
+$route['api/recipe'] = 'api/view/$i';
 $route['api'] = 'api';
 $route['recipes/(:any)'] = 'recipes/view/$1';
 $route['recipes'] = 'recipes';
