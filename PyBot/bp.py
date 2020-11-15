@@ -40,7 +40,7 @@ markupChoose = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 buttonChoose = telebot.types.KeyboardButton(StringConst.string_Choose)
 buttonBack = telebot.types.KeyboardButton(StringConst.string_Back)
 
-markupBeginCooking = telebot.types.ReplyKeyboardMarkup(row_width=2)
+markupBeginCooking = telebot.types.InlineKeyboardMarkup(row_width=2)
 buttonNextOfStep = telebot.types.InlineKeyboardButton(StringConst.string_NextStep
                                                       , callback_data='Next')
 buttonBackOfStep = telebot.types.InlineKeyboardButton(StringConst.string_BackStep
@@ -51,7 +51,6 @@ buttonExitOfStep = telebot.types.InlineKeyboardButton(StringConst.string_ExitSte
                                                       ,callback_data='Back')
 buttonEndOfStep = telebot.types.InlineKeyboardButton(StringConst.string_EndStep
                                                      ,callback_data='Next')
-
 markupEndCooking = telebot.types.InlineKeyboardMarkup(row_width=2)
 
 markupNull = telebot.types.ReplyKeyboardRemove()
@@ -71,6 +70,9 @@ class User:
 
     def __init__(self):
         isLogin = False
+        isChoose = False
+        steps = {}
+        stepNum = 0
 
     def GetUser(self, chatId):
         for us in AllUsers:
@@ -78,8 +80,28 @@ class User:
                 return us
         return None
 
+    def GetNext(self, _id):
+        self.stepNum += 1
+        if self.stepNum == len(self.steps):
+            self.stepNum = 0
+            self.steps = {}
+            bot.send_message(_id, "Приготовление закончилось! Вы молодцы!",
+                             reply_markup=markup1)
+        elif self.stepNum == len(self.steps) - 1:
+            bot.send_message(_id, self.GetStep(), reply_markup=markupEndCooking)
+        else:
+            bot.send_message(_id, self.GetStep(), reply_markup=markupMiddleCooking)
 
-
+    def GetBack(self, _id):
+        self.stepNum -= 1
+        if self.stepNum == -1:
+            self.steps = {}
+            bot.send_message(_id, "Приготовление закончилось, не успевши начаться :c",
+                             reply_markup=markup1)
+        elif self.stepNum == 0:
+            bot.send_message(_id, self.GetStep(), reply_markup=markupBeginCooking)
+        else:
+            bot.send_message(_id, self.GetStep(), reply_markup=markupMiddleCooking)
 
     def GetStep(self):
         string = "Шаг "+ str(self.stepNum+1) + '\n'+ self.steps[self.stepNum]["desc"]
@@ -190,7 +212,8 @@ def SendToBotLoginCode(message):
             if FromToServer.SendLoginCode(json.dumps(message.text)):
                 AllUsers[message.chat.id].isLogin = True
                 bot.send_message(message.chat.id,
-                         StringConst.string_LoginSucsess + " " + StringConst.string_WhatNext,
+                         StringConst.string_LoginSucsess + " " +
+                                 StringConst.string_WhatNext,
                          reply_markup=markup1)
             else:
                 bot.send_message(message.chat.id, StringConst.string_LoginError)
@@ -209,11 +232,13 @@ def SendToBotLoginCode(message):
                 AllUsers.pop(message.chat.id)
             elif message.text == StringConst.string_Choose:
                 AllUsers[message.chat.id].isChoose = True
-                bot.send_message(message.chat.id, "Прошу, вводите.", reply_markup=markupNull)
+                bot.send_message(message.chat.id, "Прошу, вводите.",
+                                 reply_markup=markupNull)
 
             elif message.text == StringConst.string_Back:
                 AllUsers[message.chat.id].isChoose = False
-                bot.send_message(message.chat.id, "Как пожелаете.", reply_markup=markup1)
+                bot.send_message(message.chat.id, "Как пожелаете.",
+                                 reply_markup=markup1)
 
             elif message.text == StringConst.string_GoCooking:
                 AllUsers[message.chat.id].stepNum = 0
@@ -228,23 +253,24 @@ def SendToBotLoginCode(message):
                         bla, message.chat.id), reply_markup=markup2)
                     AllUsers[message.chat.id].isChoose = False
                 except BaseException:
-                    bot.send_message(message.chat.id, "Неверный ввод. Попробуйте ещё раз")
+                    bot.send_message(message.chat.id,
+                                     "Неверный ввод. Попробуйте ещё раз")
             else:
                 bot.send_message(message.chat.id, "Команда не распознана.")
 
 
-@bot.callback_query_handler(func=lambda call: True):
+@bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
-    try:
+    if call.message:
         if call.data == 'Next':
             AllUsers[call.message.chat.id].GetNext(call.message.chat.id)
         elif call.data == 'Back':
             AllUsers[call.message.chat.id].GetBack(call.message.chat.id)
-        else:
-            pass
-    except BaseException:
-        pass
 
+        bot.edit_message_text(chat_id=call.message.chat.id,
+                              message_id=call.message.message_id,
+                              text=call.message.text,
+                              reply_markup=)
 
 
 # run
