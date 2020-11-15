@@ -1,3 +1,63 @@
-body{
-	background-color: #e9e9e9;
+.recipe{
+
+}
+  .image{
+    height:150px;
+    background-size: cover;
+    background-position: center;
+}
+.card{
+
+}
+div.card-img-top{
+  height: 200px;
+  background-size: cover;
+  background-position: center; 
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.card-title{
+  text-transform: uppercase;
+}
+.btn-detail{
+  text-transform: uppercase;
+}
+header{
+  background-color: #6c757d !important;
+}
+header .form-inline a,
+header .form-inline{
+    color:white;
+}
+.timer{
+  font-size: 30px;
+  background: #333;
+  color: #fff;
+  height: 60px !important;
+  width: 60px;
+  display: block;
+  line-height: 60px;
+  border-radius: 30px;
+  position: absolute;
+  right: 50px;
+  text-align: center;
+}
+.locked{
+  position: absolute;
+  width: 100%;
+  height:100%;
+  background-size: contain;
+  background-image:url("/application/views/images/lock.png");
+  background-color: rgba(0,0,0,0.5);
+  background-repeat: no-repeat;
+background-position: center;
+}
+footer{
+
+  color:#fff;
+  background-color: #6c757d !important;
+}
+footer a{
+  color:#fff;
 }
