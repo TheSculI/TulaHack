@@ -22,10 +22,10 @@ class StringConst:
     string_Choose = "Ввести номер рецепта"
     string_GoCooking = "Готовить!"
 
-    string_EndStep = "Выйти"
+    string_LeftStep = "Выйти"
     string_NextStep = "Далее"
     string_BackStep = "Назад"
-    string_ExitStep = "Завершить"
+    string_RightStep = "Завершить"
 
 
 # keyboard
@@ -47,19 +47,20 @@ buttonBackOfStep = telebot.types.InlineKeyboardButton(StringConst.string_BackSte
                                                       , callback_data='Back')
 
 markupMiddleCooking = telebot.types.InlineKeyboardMarkup(row_width=2)
-buttonExitOfStep = telebot.types.InlineKeyboardButton(StringConst.string_ExitStep
-                                                      ,callback_data='Back')
-buttonEndOfStep = telebot.types.InlineKeyboardButton(StringConst.string_EndStep
-                                                     ,callback_data='Next')
+buttonGoToRightOfStep = telebot.types.InlineKeyboardButton(StringConst.string_RightStep
+                                                      ,callback_data='Next')
+buttonGoToLeftOfStep = telebot.types.InlineKeyboardButton(StringConst.string_LeftStep
+                                                     ,callback_data='Back')
 markupEndCooking = telebot.types.InlineKeyboardMarkup(row_width=2)
 
 markupNull = telebot.types.ReplyKeyboardRemove()
 markup1.add(buttonGetAllRecept, buttonExit)
 markupChoose.add(buttonChoose, buttonBack)
 markup2.add(buttonGoCooking, buttonBack)
-markupBeginCooking.add(buttonEndOfStep, buttonNextOfStep)
+
+markupBeginCooking.add(buttonGoToLeftOfStep, buttonNextOfStep)
 markupMiddleCooking.add(buttonBackOfStep, buttonNextOfStep)
-markupMiddleCooking.add(buttonBackOfStep, buttonExitOfStep)
+markupEndCooking.add(buttonBackOfStep, buttonGoToRightOfStep)
 
 class User:
     isLogin = False
@@ -104,7 +105,7 @@ class User:
             bot.send_message(_id, self.GetStep(), reply_markup=markupMiddleCooking)
 
     def GetStep(self):
-        string = "Шаг "+ str(self.stepNum+1) + '\n'+ self.steps[self.stepNum]["desc"]
+        string = "Шаг " + str(self.stepNum+1) + '\n' + self.steps[self.stepNum]["desc"]
         if self.steps[self.stepNum]["time"] == 0:
             string += '\nВремя:' + str(self.steps[self.stepNum]["time"])
         return string
@@ -242,7 +243,7 @@ def SendToBotLoginCode(message):
 
             elif message.text == StringConst.string_GoCooking:
                 AllUsers[message.chat.id].stepNum = 0
-                bot.send_message(message.chat.id, "Начинаем!", reply_markup=markupNull)
+                bot.send_message(message.chat.id, "Начинаем!", reply_markup='')
                 bot.send_message(message.chat.id, AllUsers[message.chat.id].GetStep(),
                                  reply_markup=markupBeginCooking)
 
@@ -270,8 +271,7 @@ def callback_inline(call):
         bot.edit_message_text(chat_id=call.message.chat.id,
                               message_id=call.message.message_id,
                               text=call.message.text,
-                              reply_markup=)
-
+                              reply_markup=None)
 
 # run
 bot.polling(none_stop=True)
