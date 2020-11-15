@@ -105,9 +105,9 @@ class User:
             bot.send_message(_id, self.GetStep(), reply_markup=markupMiddleCooking)
 
     def GetStep(self):
-        string = "Шаг " + str(self.stepNum+1) + '\n' + self.steps[self.stepNum]["desc"]
-        if self.steps[self.stepNum]["time"] == 0:
-            string += '\nВремя:' + str(self.steps[self.stepNum]["time"])
+        string = "Шаг " + str(self.stepNum+1) + "\n\n" + self.steps[self.stepNum]["desc"]
+        if self.steps[self.stepNum]["time"] != 0:
+            string += "\n\nВремя:" + str(self.steps[self.stepNum]["time"])
         return string
 
 
