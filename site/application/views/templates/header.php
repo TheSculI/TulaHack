@@ -87,7 +87,7 @@
 				</div>
 			</div>
 			<div class="carousel-item text-center">
-				<img src="https://media-exp1.licdn.com/dms/image/C4E1BAQGa6FvDyuXRxQ/company-background_10000/0?e=2159024400&v=beta&t=TuP0FJ_eqcxC0xNvBzUE0GOEF89UitkbhOhummU_2lI">
+				<img src="/application/views/images/chocolate.jpg">
 				<div class="carousel-caption d-none d-md-block" style="background-color: rgba(108, 117, 125,0.6); border-radius: 3px">
 					<h5>Шоколадки</h5>
 					<p>Но я не уверен что это и вправду они</p>

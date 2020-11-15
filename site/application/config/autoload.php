@@ -135,6 +135,7 @@ $autoload['language'] = array();
 $autoload['model'] = array();
 //$autoload['model'][] = "news_model";
 $autoload['model'] = array('Recipes_model'=>'recipes');
+$autoload['model'][] = "Favorit";
 $autoload['libraries'][] = "database";
 $autoload['libraries'][] = "session";
 $autoload['helper'] = array('url');

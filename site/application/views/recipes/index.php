@@ -32,7 +32,7 @@ foreach ($recipes as $recipe):
 		</div>
 
 	<?php 
-	if ($k == 5) {
+	if ($k >= 4) {
 		echo "</div>";
 		$k=1;
 	}

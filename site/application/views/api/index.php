@@ -28,7 +28,7 @@ function goTime(){
 </script>
 <div class="row">
 <div class="col-12 text-center">
-<img src="<?=$data["img"]?>">
+<img src="<?=$data["img"]?>" class="w-75">
 </div>
 <div class="col-12 text-center my-3">
 <?=$data["description"]?>
